@@ -1,0 +1,12 @@
+#lang racket
+(define (HallarFibonacci n)
+  (if (= n 0)
+      2
+      (if (= n 1)
+          1
+          (+ (HallarFibonacci (- n 1)) (HallarFibonacci (- n 2)))
+       )
+   )
+)
+
+(HallarFibonacci 9)

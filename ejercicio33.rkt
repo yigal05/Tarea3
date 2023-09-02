@@ -1,0 +1,16 @@
+#lang racket
+(define (sumatoria i x t m)
+  (print (+ i 1))
+  (newline)
+  (if (= i  t )
+      (print (- (- x 1) (exact->inexact m)))
+      (if (= (remainder i 2) 0)
+          (sumatoria (add1 i) x t (+ m (/ (expt (- x 1) i ) i )))
+          (sumatoria (add1 i) x t (- m (/ (expt (- x 1) i ) i )))
+       )
+   )
+  )
+
+;(define valor (read))
+;(define nterminos (read))
+(sumatoria (+ 0 2) 0.5 (+ 10 2) 0)

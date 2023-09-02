@@ -1,0 +1,13 @@
+#lang racket
+
+(define (imprimir n)
+  (if (= n 80)
+      (printf "~a ~a" (string-append (make-string (- 80 n) #\space) (make-string n #\a) )n)
+      (begin
+        (printf "~a ~a\n" (string-append (make-string (- 80 n) #\space) (make-string n #\a) ) n)
+        (imprimir (+ n 1))
+       )
+   )
+ )
+
+(imprimir 1)

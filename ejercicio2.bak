@@ -1,0 +1,23 @@
+#lang racket
+
+(define (Hallarfb n)
+  (if (= n 0)
+      0
+      (if (= n 1)
+          1
+          (+ (Hallarfb (- n 1)) (Hallarfb (- n 2)))
+       )
+   )
+)
+
+(define (AbrazoMortal si n)
+  (if (> (Hallarfb n) 100)
+      (void)
+      (printf "~a " (+ si (Hallarfb n)))
+   )
+
+  
+  (AbrazoMortal (+ si (Hallarfb n)) (+ n 1))
+  )
+
+(AbrazoMortal 0 1)
