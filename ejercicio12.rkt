@@ -12,14 +12,16 @@
 - Asignatura IS105 Programación I
 - El programa recibe un numero del uno (1) al cinco (5) y devuelve si el numero es primo o no.
 |#
-(define (imprimir n)
-  (if (= n 7)
-      (void)
+(define numero (~a(read)))
+(define tamaño (- (string-length numero) 1))
+(define (volterar n)
+  (if (= n 0)
+      (printf "~a" (string-ref numero 0))
       (begin
-        (printf "~a\n" (string-append (make-string (+ 33 n) #\space) (make-string (- 13 (* 2 n)) #\P) (make-string (+ 33 n) #\space)))
-        (imprimir (+ n 1))
-       )
-   )
-  )
+        (printf "~a" (string-ref numero n))
+        (volterar (- n 1))
+        )
+    )
+)
 
-(imprimir 0)
+(volterar tamaño)

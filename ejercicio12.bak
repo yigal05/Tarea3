@@ -1,0 +1,14 @@
+#lang racket
+(define numero (~a(read)))
+(define tamaño (- (string-length numero) 1))
+(define (volterar n)
+  (if (= n 0)
+      (printf "~a" (string-ref numero 0))
+      (begin
+        (printf "~a" (string-ref numero n))
+        (volterar (- n 1))
+        )
+    )
+)
+
+(volterar tamaño)
