@@ -1,0 +1,5 @@
+#lang racket
+(require graphics/graphics)
+(open-graphics)
+(define ventana (open-viewport "ajedrez" 600 600))
+(((draw-pixmap-posn "caballo.jpg" 'unknown/mask) ventana) (make-posn 100 100))

@@ -1,0 +1,15 @@
+#lang racket
+(printf "Entre el número de terminos que desea de la serie Triangular:\n")
+(define (MantenerBucle i si numerodeterminos)
+  (if(= i numerodeterminos)
+     (void)
+     ;else
+     (begin
+      (printf "~a "   (+ si (add1 i) ) )
+      (MantenerBucle (+ i 1) (+ si (add1 i) ) numerodeterminos)
+      )
+   );endif
+)
+(printf "1 ")
+(MantenerBucle 1 1 (read))
+

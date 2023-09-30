@@ -1,7 +1,7 @@
 #lang racket
 #|
-- Fecha de publicación: 
-- Hora de publicación:
+- Fecha de publicación: 04/09/2023
+- Hora de publicación: 12:46
 - Versión de su código: 1.0
 - Autor. Ing(c) : Yigal Fabricio Rojas Acevedo
 - Nombre del lenguaje utilizado: Racket
@@ -10,22 +10,28 @@
 - Universidad Tecnológica de Pereira
 - Programa de Ingeniería de Sistemas y Computación
 - Asignatura IS105 Programación I
-- El programa recibe un numero del uno (1) al cinco (5) y devuelve si el numero es primo o no.
+- El programa calcula e con la serie de taylor pide el valor x y el numero determinos.
 |#
+(printf "Calculador de e para X\n")
 (define (factorial n)
   (if (= n 0)
       1
+      ;else
       (* n (factorial (- n 1)))
-      ))
+   );endif
+)
 
-(define (sumatoria i x t m)
-  (if (= i t)
-      (print (exact->inexact m))
-      (sumatoria (add1 i) x t (+ m (/ (expt x i) (factorial i))))
-   )
-  )
+(define (sumatoria i x terminosDeseados si)
+  (if (= i terminosDeseados)
+      (print (exact->inexact si))
+      ;else
+      (sumatoria (add1 i) x terminosDeseados (+ si (/ (expt x i) (factorial i))))
+   );endif
+)
 
-(define valor (read))
-(define nterminos (read))
+(printf "Ingrese el valor de X:\n")
+(define valor (read));este identificador guarda el valor que el usuario quiere que x tome
+(printf "Ingrese la cantidad de terminos:\n")
+(define nterminos (read)) ;este identificador guarda la cantidad de terminos que el usuario quiere en el proceso de la operación
 
 (sumatoria 0 valor nterminos 0)

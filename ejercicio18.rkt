@@ -1,7 +1,7 @@
 #lang racket
 #|
-- Fecha de publicación: 
-- Hora de publicación:
+- Fecha de publicación: 03/09/2023
+- Hora de publicación: 4:49
 - Versión de su código: 1.0
 - Autor. Ing(c) : Yigal Fabricio Rojas Acevedo
 - Nombre del lenguaje utilizado: Racket
@@ -10,24 +10,25 @@
 - Universidad Tecnológica de Pereira
 - Programa de Ingeniería de Sistemas y Computación
 - Asignatura IS105 Programación I
-- El programa recibe un numero del uno (1) al cinco (5) y devuelve si el numero es primo o no.
+- El programa genera una terna de enteros.
 |#
-(define (pareja n m c)
-  (if (< n 9)
-      (if (= (remainder n 3) 0)
+(define (Terna primerFila segundaFila tercerFila)
+  (if (< primerFila 9)
+      (if (= (remainder primerFila 3) 0)
           (begin
-            (printf "~a ~a ~a\n" n m c)
-            (pareja (+ n 1) (+ m 1) 1)
+            (printf "~a ~a ~a\n" primerFila segundaFila tercerFila)
+            (Terna (+ primerFila 1) (+ segundaFila 1) 1)
             )
+          ;else
           (begin
-            (printf "~a ~a ~a\n" n m c)
-            (pareja (+ n 1) m (+ c 1) )
+            (printf "~a ~a ~a\n" primerFila segundaFila tercerFila)
+            (Terna (+ primerFila 1) segundaFila (+ tercerFila 1) )
             )
          
-       )
-      (printf "~a ~a ~a \n" n m c)
+       );endif
+      (printf "~a ~a ~a \n" primerFila segundaFila tercerFila)
       
-   )
+   );endif
  )
 
-(pareja 1 1 1)
+(Terna 1 1 1)

@@ -1,0 +1,64 @@
+#lang racket
+
+(define caracter "0%/+#%+#/")
+(define cadenaJugador (string-copy "012345678"))
+
+(define (imprimir )
+  (printf "            ___ ___ ___ ___ ___ ___ ___ ___\n")
+  (printf "           |_~a_|_~a_|_~a_|_~a_|_~a_|_~a_|_~a_|_~a_|\n" (string-ref cadenaJugador 1) (string-ref cadenaJugador 2) (string-ref cadenaJugador 3) (string-ref cadenaJugador 4) (string-ref cadenaJugador 5) (string-ref cadenaJugador 6) (string-ref cadenaJugador 7) (string-ref cadenaJugador 8) )
+ )
+
+(define (verificar x y turno score1 score2)
+  (if (equal? caracter cadenaJugador)
+      (if (> (- score1 score2) 0 ) (printf "Gano Jugador 1") (printf "Gano jugador 2"))
+      (if (equal? (string-ref cadenaJugador x) (string-ref cadenaJugador y))
+          (begin
+            (if (equal? turno "jugador1")
+                (juego "jugador1" (add1 score1) score2)
+                (juego "jugador2" score1 (add1 score2))
+            )
+           )
+          (begin
+            (string-set! cadenaJugador y  (integer->char (+ y 48)))
+            (string-set! cadenaJugador x  (integer->char (+ x 48)))
+            (if (equal? turno "jugador1")
+                (juego "jugador2" score1 score2)
+                (juego "jugador1" score1 score2)
+            )
+           )
+
+      )
+  )
+)
+
+(define (modificarC2  x y turno score1 score2)
+  (if (= x y)
+      (begin
+        (printf "Haz ingresdo la misma casilla sigues de pendejo y te saco:")
+        (modificarC2 x (read))
+       )
+      (begin
+        (string-set! cadenaJugador y  (string-ref caracter y))
+        (imprimir)
+        (verificar x y turno score1 score2)
+       )
+   )
+)
+
+(define (modificarC1  x turno score1 score2)
+  (string-set! cadenaJugador x  (string-ref caracter x))
+  (imprimir)
+  (printf "jugador ingresa tu segunda casilla!")
+  (modificarC2   x (read) turno score1 score2 )
+)
+
+
+(define (juego turno score1 score2 )
+  (printf "                   Turno de :~a PUNTAJE: JUGADOR 1:~a \n" turno score1 )
+  (printf "                                               JUGADOR 2:~a \n" score2)
+  (imprimir)
+  (printf "jugador ingresa tu primer casilla!")
+  (modificarC1 (read) turno score1 score2)
+)
+
+(juego "jugador1" 0 0)

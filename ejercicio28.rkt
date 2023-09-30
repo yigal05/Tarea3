@@ -1,7 +1,7 @@
 #lang racket
 #|
-- Fecha de publicación: 
-- Hora de publicación:
+- Fecha de publicación: 03/09/2023
+- Hora de publicación: 12:04
 - Versión de su código: 1.0
 - Autor. Ing(c) : Yigal Fabricio Rojas Acevedo
 - Nombre del lenguaje utilizado: Racket
@@ -10,22 +10,24 @@
 - Universidad Tecnológica de Pereira
 - Programa de Ingeniería de Sistemas y Computación
 - Asignatura IS105 Programación I
-- El programa recibe un numero del uno (1) al cinco (5) y devuelve si el numero es primo o no.
+- El programa imprime una figura conformada por letras A.
 |#
-(define (imprimir n)
+(define (Imprimir n)
   (if (= n 12)
       (void)
+      ;else
       (if (< n 6)
           (begin
-            (printf "~a\n" (string-append (make-string (- 40 n) #\space) (string-append (make-string (- n 1) #\a) "a"  )  ) )
-            (imprimir (+ n 1))
+            (printf "~a\n" (string-append (make-string (- 40 n) #\space) (string-append (make-string (- n 1) #\A) "A"  )  ) )
+            (Imprimir (+ n 1))
           )
+          ;else
           (begin
-            (printf "~a\n" (string-append (make-string (- 36 (- 8 n) ) #\space) (string-append (make-string (- 11 n) #\a) "a" )  ) )
-            (imprimir (+ n 1))
+            (printf "~a\n" (string-append (make-string (- 36 (- 8 n) ) #\space) (string-append (make-string (- 11 n) #\A) "A" )  ) )
+            (Imprimir (+ n 1))
            )
-   )
-   )
+       );endif
+   );endif
  )
 
-(imprimir 1)
+(Imprimir 1)
