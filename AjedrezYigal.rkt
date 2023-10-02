@@ -12,12 +12,11 @@
   (crearTablero  0 0 1 tamañoAjedrez)
 )
 
-(define tableroBase (string-copy (string-append "1CBDEFDBCAAAAAAAA"(make-string 32 #\space)"1111111132456423" )))
-
+(define tableroBase (string-copy (string-append "!CBDFEDBCAAAAAAAA"(make-string 32 #\space)"1111111132465423" )))
 #|----------------------------------- MOVER FICHAS ------------------------------------|#
-(define (torre x) 1)
-(define (rey x) 1)
-(define (reina x) 1)
+
+
+
 
 ;--------------------------- Peon -------------------------------------------
 
@@ -36,35 +35,67 @@
 
 )
 
-;--------------------------- Alfil -------------------------------------------
-
-(define (puedeAlfil? t n i m res)
-  (print (- t m))
+;----------------------- mover torres horizontalmente ----------------------------------------------------------------------
+(define (puedeTorre t n i m res vecesbucle)
+  (print vecesbucle)
   (newline)
-  (if (= i 8)
+  (if (= i vecesbucle)
       #f
       (if (= (- t m) n)
           #t
-          (if (equal? (string-ref tableroBase (- t m) ) #\space )
-              (puedeAlfil? t n (add1 i) (+ m res) res)
-              #f
-            )
-       )
+          (if (equal? (string-ref tableroBase (- t  m ) ) #\space )
+                  (puedeTorre t n (add1 i) (+ m res) res vecesbucle)
+                   #f
+           )
+        )
 
     )
-
 )
 
+(define (encontrarRango i t n z y)
+  (if (= i 8)
+      (void)
+      (if (and (>= t z) (<= t y) )
+          (if (or  (puedeTorre t n 0 1 1 (- t z ) ) (puedeTorre t n 0 -1 -1 (- y t))  ) #t #f )
+          (encontrarRango (add1 i) t n (+ z 8) (+ y 8))
+       )
+   )
+)
+
+;--------------------- Comprobar si el moviemto que se quiere hacer es permitido -------------------------------------------
+
+(define (puedeAlfil? t n i m res)
+
+  (if (= i 7)
+      #f
+      (if (or (<= (- t m) 0) (>= (- t m) 65) )
+          #f
+          (if (= (- t m) n)
+              #t
+              (if (equal? (string-ref tableroBase (- t  m ) ) #\space )
+                  (puedeAlfil? t n (add1 i) (+ m res) res)
+                   #f
+               )
+           )
+           
+        )
+
+    )
+)
+
+;--------------------------- Alfil -------------------------------------------
 (define (alfil t x )
+
   (alfil2 t x (CasillaTocadaX (get-mouse-click ventana))  )
 )
 
 (define (alfil2 t x n)
+
  (cond
- [ (and (equal? x "4") (puedeAlfil? t n 0 9 9) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 7 7) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 -9 -9) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 -7 -7) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+ [ (and (equal? x "4") (puedeAlfil? t n 0 9 9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+ [ (and (equal? x "4") (puedeAlfil? t n 0 7 7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+ [ (and (equal? x "4") (puedeAlfil? t n 0 -9 -9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+ [ (and (equal? x "4") (puedeAlfil? t n 0 -7 -7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
   )
 
 )
@@ -92,6 +123,51 @@
    [ (and (equal? x "B") (= n (+ (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
    [ (and (equal? x "B") (= n (- (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
    [ (and (equal? x "B") (= n (+ (- t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+
+  )
+
+)
+;--------------------------- torre -------------------------------------------
+
+(define (torre t x )
+
+  (torre2 t x (CasillaTocadaX (get-mouse-click ventana))  )
+)
+
+(define (torre2 t x n)
+
+ (cond
+ [ (and (equal? x "3") (puedeAlfil? t n 0 8 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+ [ (and (equal? x "3") (encontrarRango 0 t n 1 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+ [ (and (equal? x "3") (puedeAlfil? t n 0 -8 -8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+
+  )
+
+)
+
+;--------------------------- rey -------------------------------------------
+
+(define (rey t x )
+  (rey2 t x (CasillaTocadaX (get-mouse-click ventana))  )
+)
+
+(define (rey2 t x n)
+ (cond
+ [ (and (equal? x "5") (or (= n (+ t 8)) (= n (- t 8))  (= n (+ t 1)) (= n (- t 1))  (= n (+ t 9)) (= n (- t 9))  (= n (+ t 7)) (= n (- t 7)) ) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 reyBlanco #\5) (ir) )  ]
+
+  )
+
+)
+
+;--------------------------- reina -------------------------------------------
+
+(define (reina t x )
+  (reina2 t x (CasillaTocadaX (get-mouse-click ventana))  )
+)
+
+(define (reina2 t x n)
+ (cond
+ [ (and (equal? x "6") (or (puedeAlfil? t n 0 -9 -9) (puedeAlfil? t n 0 9 9)  (puedeAlfil? t n 0 7 7) (puedeAlfil? t n 0 -7 -7) (puedeAlfil? t n 0 8 8) (puedeAlfil? t n 0 -8 -8) (encontrarRango 0 t n 1 8)   ) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 reinaBlanca #\6) (ir) )  ]
 
   )
 
@@ -237,6 +313,8 @@
  )
 
 (define (ir)
+  (print tableroBase)
+  (newline)
   (hazAccedido (CasillaTocadaX (get-mouse-click ventana)) )
 )
 (crearBase)
