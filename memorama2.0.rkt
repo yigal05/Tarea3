@@ -60,7 +60,7 @@
 (define (modificarC2  x y turno score1 score2)
   (if (= x y)
       (begin
-        (printf "Haz ingresdo la misma casilla sigues de pendejo y te saco:")
+        (printf "Haz ingresdo la misma casilla: ")
         (modificarC2 x (read))
        )
       (begin

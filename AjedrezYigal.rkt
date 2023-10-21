@@ -11,10 +11,27 @@
   ((draw-solid-rectangle ventana) (make-posn 0 0 ) (* 8 tamañoAjedrez) (* 8 tamañoAjedrez) "brown")
   (crearTablero  0 0 1 tamañoAjedrez)
 )
+(define fBlancas "1111111132465423 ")
+(define fNegras "CBDFEDBCAAAAAAAA ")
 
 (define tableroBase (string-copy (string-append "!CBDFEDBCAAAAAAAA"(make-string 32 #\space)"1111111132465423" )))
+(define casillasProhibidasBlanco (string-copy (make-string 65 #\space)))
+(define casillasProhibidasNegro (string-copy (make-string 65 #\space)))
+
 #|----------------------------------- MOVER FICHAS ------------------------------------|#
 
+(define (puedoComer x n)
+
+  (if (string-contains? fBlancas x)
+      (if (not (string-contains? fBlancas (~a (string-ref tableroBase n)))) #t #f)
+      (if (not (string-contains? fNegras (~a (string-ref tableroBase n)))) #t #f)
+   )
+  
+)
+
+(define (vacio? n)
+  (equal? (string-ref tableroBase n) #\space)
+)
 
 
 
@@ -27,10 +44,10 @@
 (define (peon2 t x n)
 
  (cond
- [ (and (equal? x "1") (= n (- t 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 peonBlanco #\1) (ir) )  ]
- [ (and (equal? x "A") (= n (+ t 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 peonNegro #\A) (ir) )  ]
- [ (and (equal? x "1") (or (= n (+ (- t 8) 1) ) (= n (- (- t 8) 1)) ) (not (equal? (string-ref tableroBase n) #\space)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 )  (colocarFicha 1 n 0 0 peonBlanco #\1) (ir) )  ]
- [ (and (equal? x "A") (or (= n (+ (+ t 8) 1) ) (= n (- (+ t 8) 1)) ) (not (equal? (string-ref tableroBase n) #\space)) ) (begin (taparBloque 1 t 0 0 )  (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 peonNegro #\A) (ir) )  ]
+ [ (and (equal? x "1") (= n (- t 8)) (vacio? n) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 peonBlanco #\1) (ir) )  ]
+ [ (and (equal? x "A") (= n (+ t 8)) (vacio? n) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 peonNegro #\A) (ir) )  ]
+ [ (and (equal? x "1") (or (= n (+ (- t 8) 1) ) (= n (- (- t 8) 1)) ) (puedoComer x n) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 )  (colocarFicha 1 n 0 0 peonBlanco #\1) (ir) )  ]
+ [ (and (equal? x "A") (or (= n (+ (+ t 8) 1) ) (= n (- (+ t 8) 1)) ) (puedoComer x n) ) (begin (taparBloque 1 t 0 0 )  (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 peonNegro #\A) (ir) )  ]
   )
 
 )
@@ -43,7 +60,7 @@
       #f
       (if (= (- t m) n)
           #t
-          (if (equal? (string-ref tableroBase (- t  m ) ) #\space )
+          (if (vacio? (- t  m ))
                   (puedeTorre t n (add1 i) (+ m res) res vecesbucle)
                    #f
            )
@@ -71,8 +88,11 @@
       (if (or (<= (- t m) 0) (>= (- t m) 65) )
           #f
           (if (= (- t m) n)
-              #t
-              (if (equal? (string-ref tableroBase (- t  m ) ) #\space )
+              (begin
+                (taparBloque 1 n 0 0 )
+                #t
+               )
+              (if (vacio? (- t  m ))
                   (puedeAlfil? t n (add1 i) (+ m res) res)
                    #f
                )
@@ -92,11 +112,18 @@
 (define (alfil2 t x n)
 
  (cond
- [ (and (equal? x "4") (puedeAlfil? t n 0 9 9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 7 7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 -9 -9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
- [ (and (equal? x "4") (puedeAlfil? t n 0 -7 -7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
-  )
+   [ (and (equal? x "4") (puedeAlfil? t n 0 9 9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+   [ (and (equal? x "4") (puedeAlfil? t n 0 7 7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+   [ (and (equal? x "4") (puedeAlfil? t n 0 -9 -9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+   [ (and (equal? x "4") (puedeAlfil? t n 0 -7 -7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilBlanco #\4) (ir) )  ]
+
+   [ (and (equal? x "D") (puedeAlfil? t n 0 9 9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilNegro #\D) (ir) )  ]
+   [ (and (equal? x "D") (puedeAlfil? t n 0 7 7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilNegro #\D) (ir) )  ]
+   [ (and (equal? x "D") (puedeAlfil? t n 0 -9 -9)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilNegro #\D) (ir) )  ]
+   [ (and (equal? x "D") (puedeAlfil? t n 0 -7 -7)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 alfilNegro #\D) (ir) )  ]
+
+
+ )
 
 )
 ;--------------------------- Caballo -------------------------------------------
@@ -106,23 +133,23 @@
 
 (define (caballo2 t x n)
  (cond
-   [ (and (equal? x "2") (= n (- (- t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (+ (+ t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (- (+ t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (+ (- t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (- (- t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (+ (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (- (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
-   [ (and (equal? x "2") (= n (+ (- t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (- (- t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 )(colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (+ (+ t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (- (+ t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (+ (- t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 )  (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (- (- t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (+ (+ t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (- (+ t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
+   [ (and (equal? x "2") (= n (+ (- t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoBlanco #\2) (ir) )  ]
 
-   [ (and (equal? x "B") (= n (- (- t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (+ (+ t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (- (+ t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (+ (- t 16) 1)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (- (- t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (+ (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (- (+ t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
-   [ (and (equal? x "B") (= n (+ (- t 2) 8)) (equal? (string-ref tableroBase n) #\space) ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (- (- t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (+ (+ t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (- (+ t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (+ (- t 16) 1)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 )(colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (- (- t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (+ (+ t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (- (+ t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
+   [ (and (equal? x "B") (= n (+ (- t 2) 8)) (or (vacio? n) (puedoComer x n)) ) (begin (taparBloque 1 t 0 0 ) (taparBloque 1 n 0 0 ) (colocarFicha 1 n 0 0 caballoNegro #\B) (ir) )  ]
 
   )
 
@@ -137,9 +164,13 @@
 (define (torre2 t x n)
 
  (cond
- [ (and (equal? x "3") (puedeAlfil? t n 0 8 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
- [ (and (equal? x "3") (encontrarRango 0 t n 1 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
- [ (and (equal? x "3") (puedeAlfil? t n 0 -8 -8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+   [ (and (equal? x "3") (puedeAlfil? t n 0 8 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+   [ (and (equal? x "3") (encontrarRango 0 t n 1 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+   [ (and (equal? x "3") (puedeAlfil? t n 0 -8 -8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreBlanca #\3) (ir) )  ]
+
+   [ (and (equal? x "C") (puedeAlfil? t n 0 8 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreNegro #\C) (ir) )  ]
+   [ (and (equal? x "C") (encontrarRango 0 t n 1 8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreNegro #\C) (ir) )  ]
+   [ (and (equal? x "C") (puedeAlfil? t n 0 -8 -8)  ) (begin (taparBloque 1 t 0 0 ) (colocarFicha 1 n 0 0 torreNegro #\C) (ir) )  ]
 
   )
 
@@ -193,28 +224,9 @@
 
 
 
-(define (CasillaTocadaX d)
-  
-  (+ (cond
-    [ (<= (posn-x (mouse-click-posn d) ) 80) 1]
-    [ (and (< (posn-x (mouse-click-posn d)) 160) (>= (posn-x (mouse-click-posn d)) 81) ) 2 ]
-    [ (and (< (posn-x (mouse-click-posn d)) 240) (>= (posn-x (mouse-click-posn d)) 161) ) 3 ]
-    [ (and (< (posn-x (mouse-click-posn d)) 320) (>= (posn-x (mouse-click-posn d)) 241)  ) 4 ]
-    [ (and (< (posn-x (mouse-click-posn d)) 400) (>= (posn-x (mouse-click-posn d)) 321)  ) 5]
-    [ (and (< (posn-x (mouse-click-posn d)) 480) (>= (posn-x (mouse-click-posn d)) 401)  ) 6]
-    [ (and (< (posn-x (mouse-click-posn d)) 560) (>= (posn-x (mouse-click-posn d)) 481)  ) 7]
-    [ (and (< (posn-x (mouse-click-posn d)) 690) (>= (posn-x (mouse-click-posn d)) 561) )  8 ])
-    (* (cond
-    [ (<= (posn-y (mouse-click-posn d) ) 80) 0]
-    [ (and (< (posn-y (mouse-click-posn d)) 160) (>= (posn-y (mouse-click-posn d)) 81) )  1  ]
-    [ (and (< (posn-y (mouse-click-posn d)) 240) (>= (posn-y (mouse-click-posn d)) 161) )  2 ]
-    [ (and (< (posn-y (mouse-click-posn d)) 320) (>= (posn-y (mouse-click-posn d)) 241)  ) 3 ]
-    [ (and (< (posn-y (mouse-click-posn d)) 400) (>= (posn-y (mouse-click-posn d)) 321)  ) 4]
-    [ (and (< (posn-y (mouse-click-posn d)) 480) (>= (posn-y (mouse-click-posn d)) 401)  ) 5]
-    [ (and (< (posn-y (mouse-click-posn d)) 560) (>= (posn-y (mouse-click-posn d)) 481)  ) 6]
-    [ (and (< (posn-y (mouse-click-posn d)) 690) (>= (posn-y (mouse-click-posn d)) 561) )  7 ]
-   ) 8 )  )
-
+(define (CasillaTocadaX d) 
+  (+ (add1 (quotient (posn-x (mouse-click-posn d)) 80))
+    (*  (quotient (posn-y (mouse-click-posn d)) 80) 8)   )
 )
 
 (define (taparBloque i obj x y )
@@ -234,16 +246,6 @@
     
   )
 )
-
-(define (ComerFicha i obj x y ficha caracter)
-  (cond
-    [ (= i obj)  (begin ( ( (draw-pixmap-posn ficha ) ventana) (make-posn x y ) ) (string-set! tableroBase obj  caracter ) ) ]
-    [ (and (= (remainder i 8) 0) ( not (= i 0))) (colocarFicha (add1 i) obj 0 (+ y 80) ficha caracter) ]
-    [ else (colocarFicha (add1 i) obj (+ x 80) y  ficha caracter) ]
-    
-  )
-)
-
 
 (define (hazAccedido t )
        (cond
@@ -317,6 +319,7 @@
   (newline)
   (hazAccedido (CasillaTocadaX (get-mouse-click ventana)) )
 )
+
 (crearBase)
 
 
