@@ -5,7 +5,7 @@
 
 ;(printf "ingrese n para n-queens: ")
 ;(define n (read))
-(define n 6)
+(define n 8)
 
 (define ventana (open-viewport "ajedrez" (* 80 n) (* 80 n) ))
 ((draw-solid-rectangle ventana) (make-posn 0 0 ) (* 80 n) (* 80 n) "black")
@@ -87,13 +87,13 @@
 )
 
 (define (horizontales i posRevisar signo vecesBucle cantidad)
- ( if (= i vecesBucle)
-      #t
-      (if ( not (char=? (string-ref tablero posRevisar ) #\X)  )
-          (horizontales (add1 i) (signo posRevisar cantidad) signo vecesBucle cantidad )
-          #f
-      )
- )
+
+ (cond
+   [ (= i vecesBucle)  #t]
+   [ (not ( (integer-in 1 (sqr n) ) posRevisar ))  #t]
+   [ ( not (char=? (string-ref tablero posRevisar ) #\X)  ) (horizontales (add1 i) (signo posRevisar cantidad) signo vecesBucle cantidad )  ]
+   [ else #f]
+  )
   
 )
 
@@ -101,7 +101,7 @@
 
 (define (encontrarRangos i x y cantidad)
   (if (and  (>= i x) (<= i y )    )
-      (and (horizontales 0  (- i 1) - (- i x) cantidad ) (horizontales 0  (+ i 1) + (- y i) cantidad )  )    ;(- i x) (- y i)
+      (and (horizontales 0  (- i cantidad) - (- i x) cantidad ) (horizontales 0  (+ i cantidad) + (- y i) cantidad )  )    ;(- i x) (- y i)
       (encontrarRangos i (+ x n) (+ y n) cantidad )
    )
 
@@ -109,7 +109,7 @@
 
 (define (verificar x)
   (and (verticales x +)
-  (verticales x -) (encontrarRangos x 1 n 1)   )
+  (verticales x -) (encontrarRangos x 1 n 1)  (encontrarRangos x 1 n (+ n 1)) (encontrarRangos x 1 n (- n 1)) )
 
 )
 
