@@ -1,4 +1,5 @@
 #lang racket
+
 (require graphics/graphics)
 (open-graphics)
 (define ventana (open-viewport "ajedrez" 880 640  ))
@@ -221,8 +222,8 @@
 (define (alfil posInicial)
   
   (   if (char-upper-case? (string-ref tablero (conocerFicha posInicial)))
-         (alfil2 posInicial  (get-mouse-click ventana) (estoyDefendiendo? (conocerFicha posInicial) "TtCcAaDdPpr" "R" "cCATDPpr" "dt" "da") )
-         (alfil2 posInicial  (get-mouse-click ventana) (estoyDefendiendo? (conocerFicha posInicial) "TtCcAaDdPpR" "r" "cCatdPpr" "DT" "DA") ))
+         (alfil2 posInicial  (get-mouse-click ventana) (estoyDefendiendo? (conocerFicha posInicial) "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da") )
+         (alfil2 posInicial  (get-mouse-click ventana) (estoyDefendiendo? (conocerFicha posInicial) "TtCcAaDdPpR" "r" "cCaAtdPpr" "DT" "DA") ))
 
 )
 
@@ -298,9 +299,9 @@
 
 (define (moveRey borde posInicial posFinal)
  (cond
-  [ (and (estoyPeligro? posFinal  "cCATDPpr" "dt" "da") (validarMov posInicial posFinal) (= borde 1) (or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (- posInicial 7) posFinal) (= (+ posInicial 9) posFinal) )) #t]
-  [ (and (estoyPeligro? posFinal  "cCATDPpr" "dt" "da") (validarMov posInicial posFinal) (= borde 4)) (or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (+ posInicial 7) posFinal) (= (- posInicial 9) posFinal) ) #t ]
-  [ (and (estoyPeligro? posFinal  "cCATDPpr" "dt" "da") (validarMov posInicial posFinal) (and (not (= (detectarBordes posInicial ) 1)) (not (= (detectarBordes posInicial ) 4)) )(or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (- posInicial 1) posFinal) (= (+ posInicial 7) posFinal) (= (- posInicial 9) posFinal) (= (- posInicial 7) posFinal) (= (+ posInicial 9) posFinal)) )  #t]
+  [ (and (revisarCasilla posFinal) (validarMov posInicial posFinal) (= borde 1) (or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (- posInicial 7) posFinal) (= (+ posInicial 9) posFinal) )) #t]
+  [ (and (revisarCasilla posFinal) (validarMov posInicial posFinal) (= borde 4)) (or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (+ posInicial 7) posFinal) (= (- posInicial 9) posFinal) ) #t ]
+  [ (and (revisarCasilla posFinal) (validarMov posInicial posFinal) (and (not (= (detectarBordes posInicial ) 1)) (not (= (detectarBordes posInicial ) 4)) )(or  (= (- posInicial 8) posFinal) (= (+ posInicial 8) posFinal) (= (+ posInicial 1) posFinal) (= (- posInicial 1) posFinal) (= (+ posInicial 7) posFinal) (= (- posInicial 9) posFinal) (= (- posInicial 7) posFinal) (= (+ posInicial 9) posFinal)) )  #t]
   [ else #f]
  )
 )
@@ -349,76 +350,42 @@
 )
 
 (define (sumaJaque x)
+  (printf "~a\n" x)
 (cond
-  [ (>= x 100) (if (reyAutosuficiente (string->number posReyNegro) "cCaATDPpr" "dt" "da" ) (begin ((draw-string ventana ) (make-posn 650 40) "JAQUE MATE" "RED")) (begin  ((draw-string ventana ) (make-posn 650 40) "█████████████████████" "black") ((draw-string ventana ) (make-posn 650 40) "JAQUE" "RED")) )]
-  [ (= x 0) ((draw-string ventana ) (make-posn 650 40) "█████████████████████" "black")]
-  [ else  ((draw-string ventana ) (make-posn 650 40) "█████████████████████" "black") ((draw-string ventana ) (make-posn 650 40) "JAQUE" "RED") ]
+  [ (>= x 100) ((draw-string ventana ) (make-posn 650 40) "JAQUE MATE" "RED")]
+  [ (= x 0) ((draw-string ventana ) (make-posn 650 40) "███████████████" "black")]
+  [ else  ((draw-string ventana ) (make-posn 650 40) "JAQUE" "RED") ]
 )
  )
 
-
-
-(define (reyAutosuficiente posRey bloqueo2 ataca1 ataca2)
-  (cond
-    [ (and (> (- posRey 8) 0) (string-contains? "TCADP" (~a (string-ref tablero (- posRey 8) )) ) (estoyPeligro? (- posRey 8) bloqueo2 ataca1 ataca2)  ) #f ]
-    [ (and (<= (- posRey 8) 64) (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 8) )) ) (estoyPeligro? (+ posRey 8) bloqueo2 ataca1 ataca2)  ) #f ]
-    
-    [ (and (= (detectarBordes posRey) 1)  (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 1) )) )) (estoyPeligro? (+ posRey 1) bloqueo2 ataca1 ataca2) )  #f]
-    [ (and (= (detectarBordes posRey) 4)  (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 1) )) )) (estoyPeligro? (- posRey 1) bloqueo2 ataca1 ataca2) )  #f]
-    
-    [ (and (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4))  ) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 1) ) ))  ) (estoyPeligro? (+ posRey 1) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4))  ) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 1) ) ))  ) (estoyPeligro? (- posRey 1) bloqueo2 ataca1 ataca2) ) #f]
-    
-    [ (and (= posRey 1) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 9) )) ))  (estoyPeligro? (+ posRey 9) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (= posRey 8) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 7) )) ))  (estoyPeligro? (+ posRey 7) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (= posRey 57) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 7) )) )) (estoyPeligro? (+ posRey 7) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (= posRey 64) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 9) )) )) (estoyPeligro? (+ posRey 9) bloqueo2 ataca1 ataca2) ) #f]
-
-    [ (and (= (detectarBordes posRey) 1) (not (or (= posRey 57) (= posRey 1)))  (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 9) ) ))  ) (estoyPeligro? (+ posRey 9) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (= (detectarBordes posRey) 1) (not (or (= posRey 57) (= posRey 1)))  (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 7) ) ))  ) (estoyPeligro? (- posRey 7) bloqueo2 ataca1 ataca2)) #f]
-
-    [ (and (= (detectarBordes posRey) 4) (not (or (= posRey 64) (= posRey 8)))  (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 9) ) ))  ) (estoyPeligro? (- posRey 9) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and (= (detectarBordes posRey) 4) (not (or (= posRey 64) (= posRey 8)))  (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 7) ) ))  ) (estoyPeligro? (+ posRey 7) bloqueo2 ataca1 ataca2) ) #f ]
-
-    [ (and ((integer-in 2 7 ) posRey) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 7) ) ))  ) (estoyPeligro? (+ posRey 7) bloqueo2 ataca1 ataca2)) #f]
-    [ (and ((integer-in 2 7 ) posRey) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 9) ) ))  ) (estoyPeligro? (+ posRey 9) bloqueo2 ataca1 ataca2)) #f]
-
-    [ (and ((integer-in 58 63) posRey) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 7) ) ))  ) (estoyPeligro? (- posRey 7) bloqueo2 ataca1 ataca2) ) #f]
-    [ (and ((integer-in 58 63) posRey) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 9) ) ))  ) (estoyPeligro? (- posRey 9) bloqueo2 ataca1 ataca2) ) #f]
-
-    [ (and  (not (or ((integer-in 2 7 ) posRey) ((integer-in 58 63) posRey))) (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4) )) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 7) ) ))  ) (estoyPeligro? (+ posRey 7) bloqueo2 ataca1 ataca2)) #f]
-    [ (and  (not (or ((integer-in 2 7 ) posRey) ((integer-in 58 63) posRey))) (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4) )) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 7) ) ))  ) (estoyPeligro? (- posRey 7) bloqueo2 ataca1 ataca2)) #f]
-    [ (and  (not (or ((integer-in 2 7 ) posRey) ((integer-in 58 63) posRey))) (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4) )) (not (string-contains? "TCADP" (~a (string-ref tablero (- posRey 9) ) ))  ) (estoyPeligro? (- posRey 9) bloqueo2 ataca1 ataca2)) #f]
-    [ (and  (not (or ((integer-in 2 7 ) posRey) ((integer-in 58 63) posRey))) (not (or (= (detectarBordes posRey) 1) (= (detectarBordes posRey) 4) )) (not (string-contains? "TCADP" (~a (string-ref tablero (+ posRey 9) ) ))  ) (estoyPeligro? (+ posRey 9) bloqueo2 ataca1 ataca2)) #f]
-
-
-    )
-)
-
-
 (define (revisarReyBlanco )
-  (sumaJaque (+ (llamarVerticales  (posRey posReyNegro)  "TCADPpacr" "td" 1)
+  (if (or (llamarVerticales  (posRey posReyNegro)  "TCADPpacr" "td" 1)
           (llamarHorizontales  (posRey posReyNegro)  "TCADPpacr" "td" 1) (llamarDiagonales  (posRey posReyNegro)  "TCADPptcr" "ad" 1 )
-          (verificarCaballoJaque (posRey posReyNegro) #\c ) ; (verificarPeon (posRey posReyNegro) )
-      )  )
+          (verificarCaballo (posRey posReyNegro) )  (verificarPeon (posRey posReyNegro) )
+      ) ((draw-string ventana ) (make-posn 650 40) "JAQUE MATE" "RED") ((draw-string ventana ) (make-posn 650 40) "███████████████" "black") )
 )
 
+(define (revisarCasilla posFinal)
+  (not (or (verificacionVertical posFinal - "TCADPpacr" "td" "" 0)    (verificacionVertical posFinal + "TCADPpacr" "td" "" 0)
+          (llamarHorizontales  posFinal  "TCADPpacr" "td" 0) (llamarDiagonales  posFinal  "TCADPptcr" "ad" 0 )
+          (verificarCaballo posFinal )  (verificarPeon posFinal )
+      ))
+ )
 
 (define (llamarVerticales  posInicio  bloqueo Abuscar modo )
   (cond
     [  ( (integer-in 1 8) posInicio) (verificacionVertical (+ (posRey posReyNegro) 8) + bloqueo Abuscar "" modo )  ]
     [  ( (integer-in 57 64) posInicio) (verificacionVertical (- (posRey posReyNegro) 8) - bloqueo Abuscar "" modo ) ]
-    [  else (if (= modo 1 ) (+  (verificacionVertical (+ (posRey posReyNegro) 8) + bloqueo Abuscar "" modo )  (verificacionVertical (- (posRey posReyNegro) 8) - bloqueo Abuscar "" modo) ) (or  (verificacionVertical (+ (posRey posReyNegro) 8) + bloqueo Abuscar "" modo )  (verificacionVertical (- (posRey posReyNegro) 8) - bloqueo Abuscar "" modo) )  )  ]
-    
+    [  (and (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4)) ) (or  (verificacionVertical (+ (posRey posReyNegro) 8) + bloqueo Abuscar "" modo )  (verificacionVertical (- (posRey posReyNegro) 8) - bloqueo Abuscar "" modo) )  ]
   )  
  
 )
 
 (define (verificacionVertical posInicio signo  bloqueo Abuscar recorrido modo )
  (cond
-   [ (not ((integer-in 1 64) posInicio) ) (if (= modo 1) 0 #f) ]
-   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) (if (= modo 1) 0 #f)  ]
-   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) )) (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 (string-append recorrido (~a posInicio)) ) (if (buscarDefensa  posInicio "cCatdPpr" "DT" "DA" #t ) 1 100) ) (if (= modo 2) posInicio #t)) ]
+   [ (not ((integer-in 1 64) posInicio) ) #f ]
+   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) #f  ]
+   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) )) (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 recorrido ) #t ) (if (= modo 2) posInicio #t)) ]
    [ else (verificacionVertical (signo posInicio 8) signo  bloqueo Abuscar (string-append recorrido (reguex (~a posInicio )) ) modo ) ]
   )
 )
@@ -434,17 +401,17 @@
   (cond
     [  (= (detectarBordes posInicio) 1) (verificacionHorizontal (+ (posRey posReyNegro) 1) + bloqueo Abuscar "" modo )  ]
     [  (= (detectarBordes posInicio) 4) (verificacionHorizontal (- (posRey posReyNegro) 1) - bloqueo Abuscar "" modo ) ]
-    [  (and (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4)) ) (if (= modo 1 ) (+  (verificacionHorizontal (+ (posRey posReyNegro) 1) + bloqueo Abuscar "" modo )  (verificacionHorizontal (- (posRey posReyNegro) 1) - bloqueo Abuscar "" modo) ) (or  (verificacionHorizontal (+ (posRey posReyNegro) 1) + bloqueo Abuscar "" modo )  (verificacionHorizontal (- (posRey posReyNegro) 1) - bloqueo Abuscar "" modo) ))  ]
+    [  (and (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4)) ) (or  (verificacionHorizontal (+ (posRey posReyNegro) 1) + bloqueo Abuscar "" modo )  (verificacionHorizontal (- (posRey posReyNegro) 1) - bloqueo Abuscar "" modo) )  ]
   )  
  
 )
 
 (define (verificacionHorizontal posInicio signo  bloqueo Abuscar recorrido modo)
  (cond
-   [ (not ((integer-in 1 64) posInicio) ) (if (= modo 1) 0 #f) ]
-   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) (if (= modo 1) 0 #f)  ]
-   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) ))  (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 (string-append recorrido (~a posInicio)) ) (if (buscarDefensa  posInicio "cCatdPpr" "DT" "DA" #t ) 1 100) ) (if (= modo 2) posInicio #t))  ]
-   [ (or (= (detectarBordes posInicio) 1) (= (detectarBordes posInicio) 4 )) (if (= modo 1) 0 #f) ]
+   [ (not ((integer-in 1 64) posInicio) ) #f ]
+   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) #f  ]
+   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) ))  (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 recorrido ) #t ) (if (= modo 2) posInicio #t))  ]
+   [ (or (= (detectarBordes posInicio) 1) (= (detectarBordes posInicio) 4 )) #f ]
    [ else (verificacionHorizontal (signo posInicio 1) signo  bloqueo Abuscar (string-append recorrido (reguex (~a posInicio )) ) modo ) ]
   )
 )
@@ -452,93 +419,46 @@
 
 (define (llamarDiagonales  posInicio  bloqueo Abuscar modo )
   (cond
-    [  (= (detectarBordes posInicio) 1) ( if (= modo 1 ) (+ (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo)  ) (or (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo)  ) ) ]
-    [  (= (detectarBordes posInicio) 4) (if (= modo  1 ) (+ (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo)   ) (or (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo)   )) ]
-    [  (and (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4)) ) (if (= modo 1 ) (+ (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo ) (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo) (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo) (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo ) ) (or (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo ) (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo) (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo) (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo ) ))  ]
+    [  (= (detectarBordes posInicio) 1) (or (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo)  ) ]
+    [  (= (detectarBordes posInicio) 4) (or (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo)  (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo)   ) ]
+    [  (and (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4)) ) (or (verificacionDiagonal (- posInicio 9) - 9  bloqueo Abuscar "" modo ) (verificacionDiagonal (+ posInicio 7) + 7  bloqueo Abuscar "" modo) (verificacionDiagonal (+ posInicio 9) + 9  bloqueo Abuscar "" modo) (verificacionDiagonal (- posInicio 7) - 7  bloqueo Abuscar "" modo ) )  ]
   )  
  
 )
 
 (define (verificacionDiagonal posInicio signo index bloqueo Abuscar recorrido modo)
  (cond
-   [ (not ((integer-in 1 64) posInicio) ) (if (= modo 1) 0 #f) ]
-   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) (if (= modo 1) 0 #f)  ]
-   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) )) (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 (string-append recorrido (~a posInicio)) ) (if (buscarDefensa  posInicio "cCatdPpr" "DT" "DA" #t ) 1 100) ) (if (= modo 2) posInicio #t)) ]
-   [ (or (= (detectarBordes posInicio) 1) (= (detectarBordes posInicio) 4 )) (if (= modo 1) 0 #f) ]
+   [ (not ((integer-in 1 64) posInicio) ) #f ]
+   [ (string-contains? bloqueo (~a (string-ref tablero posInicio) )) #f  ]
+   [ (string-contains? Abuscar (~a (string-ref tablero posInicio) )) (if (= modo 1) (if (>= (string-length recorrido ) 2)  (puedeInterponerse? 0 recorrido ) #t ) (if (= modo 2) posInicio #t)) ]
+   [ (or (= (detectarBordes posInicio) 1) (= (detectarBordes posInicio) 4 )) #f ]
    [ else (verificacionDiagonal (signo posInicio index) signo index  bloqueo Abuscar (string-append recorrido (reguex (~a posInicio )) ) modo ) ]
   )
 )
 
-(define (rvCaballo x caballoABuscar )
-  (if ( (integer-in 1 64) x) (if (char=?  (string-ref tablero x ) caballoABuscar )  #t #f )   #f)
+(define (rvCaballo x)
+  (if ( (integer-in 1 64) x) (if (char=?  (string-ref tablero x ) #\c)  #t #f )   #f)
 )
 
-(define (jCaballo casilla cA) ; jCaballo= jaque caballo
-  (if (buscarDefensa casilla "cCatdPpr" "DT" "DA" #t ) 1 100 )
- 
-)
-
-(define (verificarCaballoJaque posInicio cA ) ;cA = caballoABuscar
+(define (verificarCaballo posInicio)
   (cond
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 17) cA)  )   (jCaballo (+ posInicio 17) cA)  ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 10) cA)  ) (jCaballo (+ posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo  (- posInicio 6) cA)  ) (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (- posInicio 15) cA)  ) (jCaballo (- posInicio 15) cA) ]
-
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 17) cA)  ) (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 10) cA)  ) (jCaballo (- posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo  (+ posInicio 6) cA)  ) (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (+ posInicio 15) cA)  ) (jCaballo (+ posInicio 15) cA) ]
-
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo  (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) cA) ]
-
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) cA) ]
-
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) cA) ]
-    
-    (else 0)
-   )
-)
-
-
-(define (verificarCaballo posInicio cA ) ;cA = caballoABuscar
-  (cond
-    [ (and (= (detectarBordes posInicio) 1 ) (or  (rvCaballo (+ posInicio 17) cA) (rvCaballo (+ posInicio 10) cA) (rvCaballo  (- posInicio 6) cA) (rvCaballo (- posInicio 15) cA) )  ) #t ]
-    [ (and (= (detectarBordes posInicio) 4 ) (or  (rvCaballo (- posInicio 17) cA) (rvCaballo (- posInicio 10) cA) (rvCaballo  (+ posInicio 6) cA) (rvCaballo (+ posInicio 15) cA) )  ) #t ]
-    [ (and (= (detectarBordes posInicio) 2 ) (or  (rvCaballo (- posInicio 17) cA) (rvCaballo (- posInicio 15) cA) (rvCaballo  (- posInicio 6) cA) (rvCaballo (+ posInicio 15) cA) (rvCaballo (+ posInicio 17) cA) (rvCaballo (+ posInicio 10) cA) )  )  #t ]
-    [ (and (= (detectarBordes posInicio) 3 ) (or  (rvCaballo (- posInicio 17) cA) (rvCaballo (- posInicio 15) cA) (rvCaballo  (+ posInicio 6) cA) (rvCaballo (+ posInicio 15) cA) (rvCaballo (+ posInicio 17) cA) (rvCaballo (- posInicio 10) cA)  )  ) #t ]
-    [ (and (= (detectarBordes posInicio) 0 ) (or  (rvCaballo (- posInicio 17) cA) (rvCaballo (- posInicio 15) cA) (rvCaballo  (- posInicio 6) cA) (rvCaballo  (+ posInicio 6) cA) (rvCaballo (+ posInicio 15) cA) (rvCaballo (+ posInicio 17) cA) (rvCaballo (+ posInicio 10) cA) (rvCaballo (- posInicio 10) cA) )  ) #t ]
+    [ (and (= (detectarBordes posInicio) 1 ) (or  (rvCaballo (+ posInicio 17) ) (rvCaballo (+ posInicio 10)) (rvCaballo  (- posInicio 6)) (rvCaballo (- posInicio 15)) )  ) #t ]
+    [ (and (= (detectarBordes posInicio) 4 ) (or  (rvCaballo (- posInicio 17) ) (rvCaballo (- posInicio 10)) (rvCaballo  (+ posInicio 6)) (rvCaballo (+ posInicio 15)) )  ) #t ]
+    [ (and (= (detectarBordes posInicio) 2 ) (or  (rvCaballo (- posInicio 17) ) (rvCaballo (- posInicio 15)) (rvCaballo  (- posInicio 6)) (rvCaballo (+ posInicio 15)) (rvCaballo (+ posInicio 17)) (rvCaballo (+ posInicio 10)) )  )  #t ]
+    [ (and (= (detectarBordes posInicio) 3 ) (or  (rvCaballo (- posInicio 17) ) (rvCaballo (- posInicio 15)) (rvCaballo  (+ posInicio 6)) (rvCaballo (+ posInicio 15)) (rvCaballo (+ posInicio 17)) (rvCaballo (- posInicio 10)) )  ) #t ]
+    [ (and (= (detectarBordes posInicio) 0 ) (or  (rvCaballo (- posInicio 17) ) (rvCaballo (- posInicio 15)) (rvCaballo  (- posInicio 6)) (rvCaballo  (+ posInicio 6)) (rvCaballo (+ posInicio 15)) (rvCaballo (+ posInicio 17)) (rvCaballo (+ posInicio 10)) (rvCaballo (- posInicio 10)) )  ) #t ]
     (else #f)
    )
 )
 
-
-(define (verificarPeon posInicio pA signo) ;pA = peonABuscar
+(define (verificarPeon posInicio)
  (cond
-   [(and ( (integer-in 1 64) (signo posInicio 9 )) (= (detectarBordes posInicio) 1 ) (char=? (string-ref tablero (+ posInicio 9 )) pA) ) #t ]
-   [(and ( (integer-in 1 64) (signo posInicio 7 )) (= (detectarBordes posInicio) 4 ) (char=? (string-ref tablero (+ posInicio 7 )) pA) ) #t ]
-   [(and ( (integer-in 1 64) (signo posInicio 7 )) ( (integer-in 1 64) (signo posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (or (char=? (string-ref tablero (signo posInicio 9 )) pA) (char=? (string-ref tablero (signo posInicio 7 )) pA) )  ) #t ]
+   [(and ( (integer-in 1 64) (+ posInicio 9 )) (= (detectarBordes posInicio) 1 ) (char=? (string-ref tablero (+ posInicio 9 )) #\p) ) #t ]
+   [(and ( (integer-in 1 64) (+ posInicio 7 )) (= (detectarBordes posInicio) 4 ) (char=? (string-ref tablero (+ posInicio 7 )) #\p) ) #t ]
+   [(and ( (integer-in 1 64) (+ posInicio 7 )) ( (integer-in 1 64) (+ posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (or (char=? (string-ref tablero (+ posInicio 9 )) #\p) (char=? (string-ref tablero (+ posInicio 7 )) #\p) )  ) #t ]
    (else #f)
   )
 )
-
 
 (define (estoyDefendiendo? posInicio bloqueo1 rey bloqueo2 ataca1 ataca2 )
  (cond
@@ -554,70 +474,39 @@
   )
 )
 
-(define (estoyPeligro? posInicio bloqueo2 ataca1 ataca2)
-  (cond
-    [ (verificacionVertical (+ posInicio 8) +   bloqueo2 ataca1 "" 0) #f ]
-    [ (verificacionVertical (- posInicio 8) -   bloqueo2 ataca1 "" 0) #f ]
-    [ (verificacionHorizontal (+ posInicio 1) + bloqueo2 ataca1 "" 0) #f ]
-    [ (verificacionHorizontal (- posInicio 1) - bloqueo2 ataca1 "" 0) #f ]
-    [ (verificacionDiagonal (+ posInicio 9) + 9 bloqueo2 ataca2 "" 0) #f ]
-    [ (verificacionDiagonal (- posInicio 9) - 9 bloqueo2 ataca2 "" 0) #f ]
-    [ (verificacionDiagonal (+ posInicio 7) + 7 bloqueo2 ataca2 "" 0) #f ]
-    [ (verificacionDiagonal (- posInicio 7) - 7 bloqueo2 ataca2 "" 0) #f ]
-    (else #t)
-
-  )
-
-
-)
-
 (define (juego)
   (revisarReyBlanco )
-  (imprimirTablero 0 1)
   (darMovimiento  (get-mouse-click ventana)  )
   (juego)
 )
 
 
 (define (puedeInterponerse? i recorrido )
-  ;(printf "~a\n" recorrido)
   (if (>= i (string-length recorrido) )
       100
-      (if (= i (- (string-length recorrido) 2))
-          (if (buscarDefensa  (string->number (substring recorrido i (+ i 2))) "cCatdPpr" "DT" "DA" #t )
-              1
-              (puedeInterponerse? (+ i 2) recorrido )
-              )
-          (if (buscarDefensa  (string->number (substring recorrido i (+ i 2))) "cCatdPpr" "DT" "DA" #f )
-              1
-              (puedeInterponerse? (+ i 2) recorrido )
-              )
-          )
-      )
+      (if (buscarDefensa  (string->number (substring recorrido i (+ i 2))) "cCatdPpr" "DT" "DA" )
+          1
+          (puedeInterponerse? (+ i 2) recorrido )
+       )
   )
-
-(define (comparX x)
-  (cond
-    [ (not (= x 0) ) #f ]
-    [else #t]
-   )
 )
 
-(define (buscarDefensa  posInicio bloqueo2 ataca1 ataca2 atacante )
+(define (buscarDefensa  posInicio bloqueo2 ataca1 ataca2 )
  (cond
-   [ (and (verificacionVertical   (+ posInicio 8) +  bloqueo2 ataca1   "" 0) (comparX (estoyDefendiendo? (verificacionVertical   (+ posInicio 8) +  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionVertical   (- posInicio 8) -  bloqueo2 ataca1   "" 0) (comparX (estoyDefendiendo? (verificacionVertical   (- posInicio 8) -  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionHorizontal (+ posInicio 1) +  bloqueo2 ataca1   "" 0) (comparX (estoyDefendiendo? (verificacionHorizontal (+ posInicio 1) +  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionHorizontal (- posInicio 1) -  bloqueo2 ataca1   "" 0) (comparX (estoyDefendiendo? (verificacionHorizontal (- posInicio 1) -  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionDiagonal   (+ posInicio 9) +  9 bloqueo2 ataca2 "" 0) (comparX (estoyDefendiendo? (verificacionDiagonal   (+ posInicio 9) +  9 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionDiagonal   (- posInicio 9) -  9 bloqueo2 ataca2 "" 0) (comparX (estoyDefendiendo? (verificacionDiagonal   (- posInicio 9) -  9 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionDiagonal   (+ posInicio 7) +  7 bloqueo2 ataca2 "" 0) (comparX (estoyDefendiendo? (verificacionDiagonal   (+ posInicio 7) +  7 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (and (verificacionDiagonal   (- posInicio 7) -  7 bloqueo2 ataca2 "" 0) (comparX (estoyDefendiendo? (verificacionDiagonal   (- posInicio 7) -  7 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
-   [ (verificarCaballo posInicio #\C ) #t ]
-   [ (and atacante (verificarPeon posInicio #\P -)  ) #t ]
-   [ (and (not atacante) (char=? (string-ref tablero (- posInicio 8) ) #\P  ) ) #t]
+   [ (and (verificacionVertical   (+ posInicio 8) +  bloqueo2 ataca1   "" 0) (not (estoyDefendiendo? (verificacionVertical   (+ posInicio 8) +  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionVertical   (- posInicio 8) -  bloqueo2 ataca1   "" 0) (not (estoyDefendiendo? (verificacionVertical   (- posInicio 8) -  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionHorizontal (+ posInicio 1) +  bloqueo2 ataca1   "" 0) (not (estoyDefendiendo? (verificacionHorizontal (+ posInicio 1) +  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionHorizontal (- posInicio 1) -  bloqueo2 ataca1   "" 0) (not (estoyDefendiendo? (verificacionHorizontal (- posInicio 1) -  bloqueo2 ataca1   "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionDiagonal   (+ posInicio 9) +  9 bloqueo2 ataca2 "" 0) (not (estoyDefendiendo? (verificacionDiagonal   (+ posInicio 9) +  9 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionDiagonal   (- posInicio 9) -  9 bloqueo2 ataca2 "" 0) (not (estoyDefendiendo? (verificacionDiagonal   (- posInicio 9) -  9 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionDiagonal   (+ posInicio 7) +  7 bloqueo2 ataca2 "" 0) (not (estoyDefendiendo? (verificacionDiagonal   (+ posInicio 7) +  7 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
+   [ (and (verificacionDiagonal   (- posInicio 7) -  7 bloqueo2 ataca2 "" 0) (not (estoyDefendiendo? (verificacionDiagonal   (- posInicio 7) -  7 bloqueo2 ataca2 "" 2)  "TtCcAaDdPpr" "R" "cCaATDPpr" "dt" "da" )) )  #t]
    (else #f)
+
+   
   )
+
 )
+
 
 (juego)
