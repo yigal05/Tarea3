@@ -1,4 +1,20 @@
 #lang racket
+
+#|
+la llama dentro de revisarnegron con  (verificarPeonJaque (posRey posReyNegro) #\p +)
+(define (verificarPeonJaque posInicio pA signo) ;pA = peonABuscar
+ (cond
+   [(and ( (integer-in 1 64) (signo posInicio 9 )) (= (detectarBordes posInicio) 1 ) (char=? (string-ref tablero (+ posInicio 9 )) pA) ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) (= (detectarBordes posInicio) 4 ) (char=? (string-ref tablero (+ posInicio 7 )) pA) ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) ( (integer-in 1 64) (signo posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (char=? (string-ref tablero (signo posInicio 9 )) pA)  ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) ( (integer-in 1 64) (signo posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (char=? (string-ref tablero (signo posInicio 7 )) pA)  ) (jCaballo (signo posInicio 7 ) ) ]
+   (else 0)
+  )
+)
+
+|#
+
+
 (require graphics/graphics)
 (open-graphics)
 (define ventana (open-viewport "ajedrez" 880 640  ))
@@ -399,7 +415,7 @@
 (define (revisarReyBlanco )
   (sumaJaque (+ (llamarVerticales  (posRey posReyNegro)  "TCADPpacr" "td" 1)
           (llamarHorizontales  (posRey posReyNegro)  "TCADPpacr" "td" 1) (llamarDiagonales  (posRey posReyNegro)  "TCADPptcr" "ad" 1 )
-          (verificarCaballoJaque (posRey posReyNegro) #\c ) ; (verificarPeon (posRey posReyNegro) )
+          (verificarCaballoJaque (posRey posReyNegro) #\c )  (verificarPeonJaque (posRey posReyNegro) #\p +)
       )  )
 )
 
@@ -473,48 +489,58 @@
   (if ( (integer-in 1 64) x) (if (char=?  (string-ref tablero x ) caballoABuscar )  #t #f )   #f)
 )
 
-(define (jCaballo casilla cA) ; jCaballo= jaque caballo
+(define (jCaballo casilla ) ; jCaballo= jaque caballo
   (if (buscarDefensa casilla "cCatdPpr" "DT" "DA" #t ) 1 100 )
  
 )
 
 (define (verificarCaballoJaque posInicio cA ) ;cA = caballoABuscar
   (cond
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 17) cA)  )   (jCaballo (+ posInicio 17) cA)  ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 10) cA)  ) (jCaballo (+ posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo  (- posInicio 6) cA)  ) (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (- posInicio 15) cA)  ) (jCaballo (- posInicio 15) cA) ]
+    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 17) cA)  ) (jCaballo (+ posInicio 17) )  ]
+    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (+ posInicio 10) cA)  ) (jCaballo (+ posInicio 10) ) ]
+    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo  (- posInicio 6) cA)  ) (jCaballo (- posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 1 ) (rvCaballo (- posInicio 15) cA)  ) (jCaballo (- posInicio 15) ) ]
 
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 17) cA)  ) (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 10) cA)  ) (jCaballo (- posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo  (+ posInicio 6) cA)  ) (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (+ posInicio 15) cA)  ) (jCaballo (+ posInicio 15) cA) ]
+    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 17) cA)  ) (jCaballo (- posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (- posInicio 10) cA)  ) (jCaballo (- posInicio 10) ) ]
+    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo  (+ posInicio 6) cA)  ) (jCaballo (+ posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 4 ) (rvCaballo (+ posInicio 15) cA)  ) (jCaballo (+ posInicio 15) ) ]
 
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo  (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) cA) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo  (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 2 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) ) ]
 
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) cA) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 3 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) ) ]
 
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) cA) ]
-    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) cA) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 17) cA)  )  (jCaballo (- posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 15) cA)  )  (jCaballo (- posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo  (+ posInicio 6) cA)  )  (jCaballo (+ posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 15) cA)  )  (jCaballo (+ posInicio 15) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 17) cA)  )  (jCaballo (+ posInicio 17) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 10) cA)  )  (jCaballo (- posInicio 10) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (- posInicio 6) cA)  )  (jCaballo (- posInicio 6) ) ]
+    [ (and (= (detectarBordes posInicio) 0 ) (rvCaballo (+ posInicio 10) cA)  )  (jCaballo (+ posInicio 10) ) ]
     
     (else 0)
    )
+)
+
+(define (verificarPeonJaque posInicio pA signo) ;pA = peonABuscar
+ (cond
+   [(and ( (integer-in 1 64) (signo posInicio 9 )) (= (detectarBordes posInicio) 1 ) (char=? (string-ref tablero (+ posInicio 9 )) pA) ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) (= (detectarBordes posInicio) 4 ) (char=? (string-ref tablero (+ posInicio 7 )) pA) ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) ( (integer-in 1 64) (signo posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (char=? (string-ref tablero (signo posInicio 9 )) pA)  ) (jCaballo (signo posInicio 9 ) ) ]
+   [(and ( (integer-in 1 64) (signo posInicio 7 )) ( (integer-in 1 64) (signo posInicio 9 )) (not (= (detectarBordes posInicio ) 1)) (not (= (detectarBordes posInicio ) 4))  (char=? (string-ref tablero (signo posInicio 7 )) pA)  ) (jCaballo (signo posInicio 7 ) ) ]
+   (else 0)
+  )
 )
 
 
@@ -564,6 +590,7 @@
     [ (verificacionDiagonal (- posInicio 9) - 9 bloqueo2 ataca2 "" 0) #f ]
     [ (verificacionDiagonal (+ posInicio 7) + 7 bloqueo2 ataca2 "" 0) #f ]
     [ (verificacionDiagonal (- posInicio 7) - 7 bloqueo2 ataca2 "" 0) #f ]
+    ( (not (= (verificarPeonJaque posInicio #\p +)  0) ) #f)
     (else #t)
 
   )
